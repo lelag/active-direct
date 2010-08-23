@@ -20,6 +20,9 @@ module ActiveDirect
     def process_rpc
       resp = []
       actions.each { |a| resp << invoke_method(a.model, a.method, a.parameters, a.tid) }
+      if resp.count == 1
+          resp = resp[0]
+      end
 
       if form_post_and_upload?
         "<html><body><textarea>#{resp.to_json}</textarea></body></html>"
