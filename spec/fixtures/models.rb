@@ -3,6 +3,7 @@ class Video < ActiveRecord::Base
   belongs_to :category
   
   def self.create_attachment(args = {})
+    args
   end
   
   def self.direct_method

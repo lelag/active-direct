@@ -8,6 +8,7 @@ module ActiveDirect
 
     def call(env)
       @env = env
+      @request = Rack::Request.new(env)
       if env["PATH_INFO"].match("^#{@router_path}")
         @post_data = get_post_data
         result = process_rpc
@@ -80,7 +81,12 @@ module ActiveDirect
 				params = params.map {|p| Hash === p ? p.symbolize_keys : p }
         return params
       else
-        normalized_params = params[model.downcase]
+        normalized_params = params
+        normalized_params.delete("extUpload")
+        normalized_params.delete("extMethod")
+        normalized_params.delete("extType")
+        normalized_params.delete("extAction")
+        normalized_params.delete("extTID")
         normalized_params.each do |k, v|
           if v.is_a?(Hash) && v.include?('tempfile') && v['tempfile'].is_a?(Tempfile)
             normalized_params[k] = v['tempfile']
@@ -100,7 +106,7 @@ module ActiveDirect
     end
 
     def get_form_post_data
-      form_post_data = @env['rack.request'].params
+      form_post_data = @request.POST
       with_indifferent_access_for_hash(form_post_data)
     end
 
